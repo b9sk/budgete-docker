@@ -1,0 +1,5 @@
+.idea/
+app/*
+!app/.gkeep
+logs/nginx/*
+!logs/nginx/.gkeep

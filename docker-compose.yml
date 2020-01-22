@@ -1,0 +1,43 @@
+###############################################################################
+#                          Generated on phpdocker.io                          #
+###############################################################################
+version: "3.1"
+services:
+
+    mysql:
+      image: mysql:8.0
+      container_name: budgete-mysql
+      environment:
+        - MYSQL_ROOT_PASSWORD=root
+        - MYSQL_DATABASE=symfony
+        - MYSQL_USER=symfony
+        - MYSQL_PASSWORD=symfony
+      networks:
+        - budgete
+
+    webserver:
+      image: nginx:alpine
+      container_name: budgete-webserver
+      working_dir: /application
+      volumes:
+          - ./app:/application
+          - ./phpdocker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+          - ./logs/nginx:/var/log/nginx
+      ports:
+       - "8080:80"
+      networks:
+        - budgete
+
+    php-fpm:
+      build: phpdocker/php-fpm
+      container_name: budgete-php-fpm
+      working_dir: /application
+      volumes:
+        - ./app:/application
+        - ./phpdocker/php-fpm/php-ini-overrides.ini:/etc/php/7.2/fpm/conf.d/99-overrides.ini
+      networks:
+        - budgete
+
+
+networks:
+    budgete:
