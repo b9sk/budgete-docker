@@ -7,6 +7,7 @@ services:
     mysql:
       image: mysql:5.7
       container_name: budgete-mysql
+      # TDB: .env file to separate dev from other stages
       environment:
         - MYSQL_ROOT_PASSWORD=root
         - MYSQL_DATABASE=symfony
