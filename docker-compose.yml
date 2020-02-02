@@ -27,7 +27,8 @@ services:
             - ./phpdocker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
             - ./logs/nginx:/var/log/nginx
         ports:
-            - "8080:80"
+            - "80:80"
+            - "443:443"
         networks:
             - budgete
 
@@ -39,14 +40,6 @@ services:
         volumes:
             - ./app:/application
             - ./phpdocker/php-fpm/php-ini-overrides.ini:/etc/php/7.2/fpm/conf.d/99-overrides.ini
-        networks:
-            - budgete
-
-    adminer:
-        image: adminer
-        restart: always
-        ports:
-            - "8081:8080"
         networks:
             - budgete
 
