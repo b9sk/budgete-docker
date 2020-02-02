@@ -19,7 +19,7 @@ services:
 
     webserver:
         restart: always
-        image: nginx:alpine
+        build: phpdocker/nginx
         container_name: budgete-webserver
         working_dir: /application
         volumes:
