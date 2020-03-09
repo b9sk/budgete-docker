@@ -1,55 +1,39 @@
 ###############################################################################
 #                          Generated on phpdocker.io                          #
 ###############################################################################
-version: "3.1"
+version: "3.5"
 services:
 
-    mysql:
+    postgres:
         restart: always
-        image: mysql:5.7
-        container_name: budgete-mysql
-        # TDB: .env file to separate dev from other stages
-        environment:
-            - MYSQL_ROOT_PASSWORD=root
-            - MYSQL_DATABASE=symfony
-            - MYSQL_USER=symfony
-            - MYSQL_PASSWORD=symfony
-        networks:
-            - budgete
+        build: phpdocker/postgres
+        container_name: ${PROJECT_NAME}-psql
+        env_file:
+            - ./.env
 
-    webserver:
+    php:
         restart: always
-        image: nginx:alpine
-        container_name: budgete-webserver
+        depends_on:
+            - postgres
+        build: phpdocker/php-fpm
+        container_name: ${PROJECT_NAME}-php
         working_dir: /application
         volumes:
-            - ./app:/application
+            - ${APP_SRC}:/application
+            - ./phpdocker/php-fpm/php-ini-overrides.ini:/etc/php/7.4/fpm/conf.d/99-overrides.ini
+            - ./phpdocker/php-fpm/autorun.sh:/autorun.sh
+
+    nginx:
+        restart: always
+        depends_on:
+            - php
+        image: nginx:alpine
+        container_name: ${PROJECT_NAME}-nginx
+        working_dir: /application
+        volumes:
+            - ${APP_SRC}:/application
             - ./phpdocker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
             - ./logs/nginx:/var/log/nginx
         ports:
-            - "8080:80"
-        networks:
-            - budgete
+            - "8888:80"
 
-    php-fpm:
-        restart: always
-        build: phpdocker/php-fpm
-        container_name: budgete-php-fpm
-        working_dir: /application
-        volumes:
-            - ./app:/application
-            - ./phpdocker/php-fpm/php-ini-overrides.ini:/etc/php/7.2/fpm/conf.d/99-overrides.ini
-        networks:
-            - budgete
-
-    adminer:
-        image: adminer
-        restart: always
-        ports:
-            - "8081:8080"
-        networks:
-            - budgete
-
-
-networks:
-    budgete:
